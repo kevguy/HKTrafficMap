@@ -2,6 +2,7 @@ package com.example.android.csci3310asg3;
 
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -41,8 +42,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        LatLng TKO = new LatLng(22.320591452, 114.254794525);
+        mMap.addMarker(new MarkerOptions().position(TKO).title("Marker in TKO"));
+
+        //mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(TKO));
+
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(com.google.android.gms.maps.model.Marker marker) {
+                marker.showInfoWindow();
+                Toast.makeText(getApplicationContext(), "Oh Fuck", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
     }
 }
