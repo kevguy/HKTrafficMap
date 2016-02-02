@@ -1,5 +1,6 @@
 package com.example.android.csci3310asg3;
 
+import android.speech.tts.TextToSpeech;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -19,6 +20,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -27,6 +29,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private HashMap<Marker, MyMarker> mMarkersHashMap;
     private ArrayList<String> mCCTVPic = new ArrayList<String>();
     private ArrayList<String> mCCTVDesc = new ArrayList<String>();
+    private TextToSpeech t1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +39,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        t1=new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if(status != TextToSpeech.ERROR) {
+                    t1.setLanguage(Locale.US);
+                    //t1.setLanguage(Locale.CHINESE);
+                }
+            }
+        });
+
     }
 
 
@@ -81,6 +95,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMyMarkersArray.add(new MyMarker("Atlantic Ocean", "icondefault", Double.parseDouble("-13.1294607"), Double.parseDouble("-19.9602353")));
         */
 
+        // https://www.geodetic.gov.hk/smo/tform/tform.aspx
         mMyMarkersArray.add(new MyMarker("0", "0", Double.parseDouble("22.286175065"), Double.parseDouble("114.155448639")));
         mMyMarkersArray.add(new MyMarker("1", "1", Double.parseDouble("22.281298756"), Double.parseDouble("114.157302717")));
         mMyMarkersArray.add(new MyMarker("2", "2", Double.parseDouble("22.279899072"), Double.parseDouble("114.157846293")));
@@ -147,7 +162,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public boolean onMarkerClick(com.google.android.gms.maps.model.Marker marker) {
                 marker.showInfoWindow();
-                Toast.makeText(getApplicationContext(), "Oh Fuck", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(), "Oh Boy", Toast.LENGTH_SHORT).show();
                 return true;
             }
         });
@@ -157,6 +172,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     {
         if(markers.size() > 0)
         {
+            int i = 0;
             for (MyMarker myMarker : markers)
             {
 
@@ -164,10 +180,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 MarkerOptions markerOption = new MarkerOptions().position(new LatLng(myMarker.getmLatitude(), myMarker.getmLongitude()));
                 markerOption.icon(BitmapDescriptorFactory.fromResource(R.drawable.abc));
 
+                markerOption.icon(BitmapDescriptorFactory.fromResource(getApplicationContext().getResources()
+                    .getIdentifier("i" + i, "drawable", getApplicationContext().getPackageName())));
+
                 Marker currentMarker = mMap.addMarker(markerOption);
                 mMarkersHashMap.put(currentMarker, myMarker);
 
                 mMap.setInfoWindowAdapter(new MarkerInfoWindowAdapter());
+                i = i + 1;
             }
         }
     }
@@ -569,6 +589,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Picasso.with(getApplicationContext()).load(mCCTVPic.get(Integer.parseInt(myMarker.getmLabel()))).into(markerIcon);
 
             markerLabel.setText(mCCTVDesc.get(Integer.parseInt(myMarker.getmLabel())));
+
+            String toSpeak = mCCTVDesc.get(Integer.parseInt(myMarker.getmLabel()));
+            //Toast.makeText(getApplicationContext(), toSpeak, Toast.LENGTH_SHORT).show();
+            t1.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null);
+            //t1.speak("", TextToSpeech.QUEUE_FLUSH, null);
 
             return v;
         }
